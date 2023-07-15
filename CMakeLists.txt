@@ -41,7 +41,7 @@ find_package(Threads REQUIRED)
 
 #find_package(Snappy CONFIG REQUIRED)
 
-set (PYBIND11_PYTHON_VERSION "3.11")
+#set (PYBIND11_PYTHON_VERSION "3.11")
 find_package(pybind11 CONFIG REQUIRED)
 
 pkg_search_module(UUID REQUIRED uuid)
@@ -70,7 +70,7 @@ list(APPEND LINK_LIBS ${PKGDEPS_LIBRARIES})
 
 
 find_package (Python ${PYBIND11_PYTHON_VERSION} EXACT COMPONENTS Interpreter)
-message("PYTHON_SITEARCH:${Python_SITEARCH}")
+message("PYTHON_SITEARCH----------------->:${Python_SITEARCH}")
 
 
 
