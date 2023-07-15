@@ -1,3 +1,5 @@
+.gitignore
+cm.sh
 __pycache__
 doc
 build
