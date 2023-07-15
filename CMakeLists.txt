@@ -67,6 +67,13 @@ endforeach ()
 link_directories(${PKGDEPS_LIBRARY_DIRS})
 list(APPEND LINK_LIBS ${PKGDEPS_LIBRARIES})
 
+
+
+find_package (Python ${PYBIND11_PYTHON_VERSION} EXACT COMPONENTS Interpreter)
+message("PYTHON_SITEARCH:${Python_SITEARCH}")
+
+
+
 set(SRC_FILES
     srcxx/srpsamples.cpp
     srcxx/srpconfig.cpp
@@ -97,10 +104,16 @@ pybind11_add_module(${PROJECT_NAME} MODULE
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${LINK_LIBS} Threads::Threads uuid)
 
+
 install(TARGETS srpy
-  COMPONENT python
-  #RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
-  LIBRARY DESTINATION "${PYTHON_LIBRARY_DIR}"
-  #ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-  )
+   COMPONENT python
+   LIBRARY DESTINATION "${Python_SITEARCH}"
+)
+
+# install(TARGETS srpy
+#   COMPONENT python
+#   RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+#   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+#   ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+#)
  
