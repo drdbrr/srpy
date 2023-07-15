@@ -44,9 +44,9 @@ find_package(Threads REQUIRED)
 
 
 
-#set (PYBIND11_PYTHON_VERSION "3.10")
+set (PYBIND11_PYTHON_VERSION "3.10")
 find_package(pybind11 CONFIG REQUIRED)
-#set (PYBIND11_PYTHON_VERSION "3.10")
+
 find_package (Python ${PYBIND11_PYTHON_VERSION} EXACT COMPONENTS Interpreter)
 
 
