@@ -42,9 +42,10 @@ find_package(Threads REQUIRED)
 #find_package(Snappy CONFIG REQUIRED)
 
 set (PYBIND11_PYTHON_VERSION "3.10")
+find_package(pybind11 CONFIG REQUIRED)
 find_package (Python ${PYBIND11_PYTHON_VERSION} EXACT COMPONENTS Interpreter)
 message("PYTHON_SITEARCH-------->:${Python_SITEARCH}")
-find_package(pybind11 CONFIG REQUIRED)
+
 
 pkg_search_module(UUID REQUIRED uuid)
 
