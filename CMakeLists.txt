@@ -41,10 +41,13 @@ find_package(Threads REQUIRED)
 
 #find_package(Snappy CONFIG REQUIRED)
 
-set (PYBIND11_PYTHON_VERSION "3.10")
-find_package(pybind11 CONFIG REQUIRED)
-find_package (Python ${PYBIND11_PYTHON_VERSION} EXACT COMPONENTS Interpreter)
-message("PYTHON_SITEARCH-------->:${Python_SITEARCH}")
+#set (PYBIND11_PYTHON_VERSION "3.10")
+    find_package(pybind11 CONFIG REQUIRED)
+
+#PYTHON_VERSION_STRING
+
+#find_package (Python ${PYBIND11_PYTHON_VERSION} EXACT COMPONENTS Interpreter)
+#message("PYTHON_VERSION_STRING-------->:${PYTHON_VERSION_STRING}")
 
 
 pkg_search_module(UUID REQUIRED uuid)
@@ -73,7 +76,7 @@ list(APPEND LINK_LIBS ${PKGDEPS_LIBRARIES})
 
 
 
-message("PYTHON_SITEARCH-------->:${Python_SITEARCH}")
+#message("PYTHON_SITEARCH-------->:${Python_SITEARCH}")
 
 
 set(SRC_FILES
@@ -110,7 +113,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${LINK_LIBS} Threads::Threads uuid)
 
 install(TARGETS srpy
    COMPONENT python
-   LIBRARY DESTINATION "${Python_SITEARCH}"
+   LIBRARY DESTINATION "${PYTHON_VERSION_STRING}"
 )
 
 # install(TARGETS srpy
