@@ -113,7 +113,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${LINK_LIBS} Threads::Threads uuid)
 
 install(TARGETS srpy
    COMPONENT python
-   LIBRARY DESTINATION "${PYTHON_VERSION_STRING}"
+   LIBRARY DESTINATION "${PYBIND11_PYTHON_VERSION}"
 )
 
 # install(TARGETS srpy
