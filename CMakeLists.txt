@@ -41,7 +41,7 @@ find_package(Threads REQUIRED)
 
 #find_package(Snappy CONFIG REQUIRED)
 
-set (PYBIND11_PYTHON_VERSION "3.10")
+set (PYBIND11_PYTHON_VERSION "3.11")
 find_package(pybind11 CONFIG REQUIRED)
 
 pkg_search_module(UUID REQUIRED uuid)
