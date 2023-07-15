@@ -102,7 +102,6 @@ set(HDR_FILES
     srcxx/srpcxx.hpp
 )
 
-set (PYBIND11_PYTHON_VERSION "3.10")
 pybind11_add_module(${PROJECT_NAME} MODULE
     ${SRC_FILES}
     ${HDR_FILES}
