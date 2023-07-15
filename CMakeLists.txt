@@ -45,9 +45,10 @@ find_package(Threads REQUIRED)
 
 
 set (PYBIND11_PYTHON_VERSION "3.10")
+#find_package (Python ${PYBIND11_PYTHON_VERSION} EXACT COMPONENTS Interpreter)
 find_package(pybind11 CONFIG REQUIRED)
 
-find_package (Python ${PYBIND11_PYTHON_VERSION} EXACT COMPONENTS Interpreter)
+
 
 
 
@@ -117,7 +118,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${LINK_LIBS} Threads::Threads uuid)
 
 install(TARGETS srpy
    COMPONENT python
-   LIBRARY DESTINATION "${Python_SITEARCH}"
+   LIBRARY DESTINATION "/usr/lib/python${PYBIND11_PYTHON_VERSION}/site-packages"
 )
 
 # install(TARGETS srpy
