@@ -85,7 +85,7 @@ list(APPEND LINK_LIBS ${PKGDEPS_LIBRARIES})
 
 
 
-message("PYTHON_SITE-------->:${PYTHON_SITE}")
+message("PYTHON_VER-------->:${PYTHON_VER}")
 
 
 set(SRC_FILES
@@ -121,7 +121,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${LINK_LIBS} Threads::Threads uuid)
 
 install(TARGETS srpy
    COMPONENT python
-   LIBRARY DESTINATION "/usr/lib/python${PYBIND11_PYTHON_VERSION}/site-packages"
+   LIBRARY DESTINATION ${PYTHON_SITE}
 )
 
 # install(TARGETS srpy
