@@ -39,26 +39,7 @@ include_directories(
 find_package(PkgConfig REQUIRED)
 find_package(Threads REQUIRED)
 
-
-
-
-
-
-#set (PYBIND11_PYTHON_VERSION "3.10")
-#find_package (Python ${PYBIND11_PYTHON_VERSION} EXACT COMPONENTS Interpreter)
-#find_package(pybind11 REQUIRED)
-
-
-#find_package(Python COMPONENTS Interpreter Development)
 find_package(pybind11 CONFIG REQUIRED)
-
-
-
-
-
-
-
-
 
 pkg_search_module(UUID REQUIRED uuid)
 
@@ -82,10 +63,7 @@ endforeach ()
 link_directories(${PKGDEPS_LIBRARY_DIRS})
 list(APPEND LINK_LIBS ${PKGDEPS_LIBRARIES})
 
-
-
-
-message("PYTHON_VER-------->:${PYTHON_VER}")
+message("PYTHON_SITE-------->:${PYTHON_SITE}")
 
 
 set(SRC_FILES
@@ -123,11 +101,3 @@ install(TARGETS srpy
    COMPONENT python
    LIBRARY DESTINATION ${PYTHON_SITE}
 )
-
-# install(TARGETS srpy
-#   COMPONENT python
-#   RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
-#   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-#   ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-#)
- 
