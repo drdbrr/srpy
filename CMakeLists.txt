@@ -44,9 +44,13 @@ find_package(Threads REQUIRED)
 
 
 
-set (PYBIND11_PYTHON_VERSION "3.10")
+#set (PYBIND11_PYTHON_VERSION "3.10")
 #find_package (Python ${PYBIND11_PYTHON_VERSION} EXACT COMPONENTS Interpreter)
-find_package(pybind11 CONFIG REQUIRED)
+#find_package(pybind11 REQUIRED)
+
+
+find_package(Python COMPONENTS Interpreter Development)
+find_package(pybind11 CONFIG)
 
 
 
@@ -64,7 +68,6 @@ pkg_search_module(UUID REQUIRED uuid)
 
 list(APPEND PKGDEPS libsigrokcxx)
 
-find_package(PkgConfig)
 pkg_check_modules(PKGDEPS REQUIRED ${PKGDEPS})
 
 set(CMAKE_REQUIRED_INCLUDES "${PKGDEPS_INCLUDE_DIRS}")
@@ -82,7 +85,7 @@ list(APPEND LINK_LIBS ${PKGDEPS_LIBRARIES})
 
 
 
-message("PYTHON_SITEARCH-------->:${Python_SITEARCH}")
+message("PYTHON_PATH-------->:${PYTHON_PATH}")
 
 
 set(SRC_FILES
