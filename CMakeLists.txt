@@ -63,7 +63,7 @@ endforeach ()
 link_directories(${PKGDEPS_LIBRARY_DIRS})
 list(APPEND LINK_LIBS ${PKGDEPS_LIBRARIES})
 
-message("PYTHON_SITE-------->:${PYTHON_SITE}")
+#message("PYTHON_SITE-------->:${PYTHON_SITE}")
 
 
 set(SRC_FILES
