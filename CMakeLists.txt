@@ -85,7 +85,7 @@ list(APPEND LINK_LIBS ${PKGDEPS_LIBRARIES})
 
 
 
-message("PYTHON_PATH-------->:${PYTHON_PATH}")
+message("EPYTHON-------->:${EPYTHON}")
 
 
 set(SRC_FILES
