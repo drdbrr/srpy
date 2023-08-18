@@ -2,9 +2,12 @@
 #include <libsigrok/libsigrok.h>
 #include <thread>
 #include <atomic>
-//#include <functional>
 #include <map>
+#include <vector>
 #include "srpcxx.hpp"
+
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
 
 namespace srp {
     class SrpSession : public sigrok::ParentOwned<SrpSession, SrpManager>
@@ -17,6 +20,8 @@ namespace srp {
         };
         SrpSession(struct sr_context *ctx, std::string ses_id);
         ~SrpSession();
+
+        //virtual std::string go(int n_times) = 0;
 
         std::shared_ptr<SrpDevice> device();
         //std::shared_ptr<SrpDevice> get_device(const struct sr_dev_inst *sdi);
@@ -32,28 +37,39 @@ namespace srp {
         std::shared_ptr<SrpSamples> get_storage(std::string stor_id);
         std::shared_ptr<SrpSamples> current_storage();
 
+
+        void set_loop(py::object &coro, py::object &coro_stop, py::object &loop);
+        const py::function run_coro_ts;
+
+        py::object coro_;
+        py::object coro_stop_;
+        py::object loop_;
+
     private:
         const std::string ses_id_;
         struct sr_session *session_;
         struct sr_context *ctx_;
         std::shared_ptr<SrpDevice> device_;
 
+
         
         std::atomic<Capture> capture_state_;
         void set_capture_state(Capture state);
 
         //TODO
-        std::map<std::string, std::shared_ptr<SrpSamples> > storage_;
+        std::map<std::string, std::shared_ptr<SrpSamples>> storage_;
         std::string cur_storid_;
         
         std::thread sampl_th_;
         void sampl_proc_th();
 
-        //mutable std::mutex sampling_mutex_;
-        
         bool out_of_memory_;
+
+
+        std::vector<std::shared_ptr<SrpDecoder> > stack_;
+
         
-        friend class SrpSamples;
+        //friend class SrpSamples;
         friend class SrpManager;
         friend class SrpDevice;
         friend struct std::default_delete<SrpSession>;

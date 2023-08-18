@@ -1,5 +1,6 @@
 #include "srpsession.hpp"
 #include "srpsamples.hpp"
+//#include "srpsamplesheap.hpp"
 #include "srpdevice.hpp"
 #include "srpchannels.hpp"
 #include "srpconfig.hpp"
@@ -7,6 +8,7 @@
 #include <atomic>
 #include <cstdint>
 #include <iostream>
+#include <pybind11/gil.h>
 #include <vector>
 #include <memory>
 #include <algorithm>
@@ -21,9 +23,10 @@ using std::bad_alloc;
 
 namespace srp {
     SrpSession::SrpSession(struct sr_context *ctx, string ses_id):
+        ses_id_(ses_id),
         session_(nullptr),
         ctx_(move(ctx)),
-        ses_id_(ses_id),
+        run_coro_ts{py::module_::import("asyncio").attr("run_coroutine_threadsafe")},
         capture_state_{Stopped}
     {
         srcheck(sr_session_new(ctx_, &session_));
@@ -41,11 +44,15 @@ namespace srp {
     {
         SrpSession *ses = static_cast<SrpSession *>(cb_data);
         std::shared_ptr<SrpSamples> stor = ses->current_storage();
-        
+
         switch (packet->type) {
             case SR_DF_HEADER:
+            {
+                //py::gil_scoped_acquire gil{};
+                //py::object exp_pi = ses->run_coro_ts(ses->coro_, ses->loop_);
                 stor->feed_header();
                 break;
+            }
                 
             case SR_DF_META:
                 break;
@@ -62,13 +69,23 @@ namespace srp {
                 break;
 
             case SR_DF_END:
+            {
+                //py::gil_scoped_acquire gil{};
+                //py::object exp_pi = ses->run_coro_ts(ses->coro_stop_, ses->loop_);
                 stor->feed_end();
                 break;
-
+            }
             default:
                 break;
         }
     }
+
+    /*
+    void SrpSession::add_decoder(std::string dId){
+
+    }
+    */
+
 
     void SrpSession::add_device(shared_ptr<SrpDevice> device)
     {
@@ -124,6 +141,7 @@ namespace srp {
 
     void SrpSession::start_capture()
     {
+
         if (!device_){
             //TODO: throw here
             return;
@@ -175,15 +193,16 @@ namespace srp {
     //shared_ptr<SrpSamples>
     void SrpSession::new_storage()
     {
-        std::unordered_map<uint8_t, AChStat*> analog;
+        //std::unordered_map<uint8_t, AChStat*> analog;
         //std::unordered_map<uint8_t, AChControl*> analog;
 
+        vector<uint8_t> analog;
         vector<string> logic;
 
         for (auto const& [name, ch] : device_->channels() ){
             if (ch->enabled()){
                 if(ch->type() == SR_CHANNEL_ANALOG)
-                    analog.emplace( ch->index(), new AChStat );
+                    analog.push_back( ch->index() );
 
                 else if (ch->type() == SR_CHANNEL_LOGIC)
                     logic.push_back(name);
@@ -191,10 +210,10 @@ namespace srp {
         }
 
         shared_ptr<SrpConfig> smpls_lim_cfg = device_->config()["limit_samples"];
-        uint64_t smpls_lim = std::get<uint64_t>(smpls_lim_cfg->value());
+        const uint64_t smpls_lim = std::get<uint64_t>(smpls_lim_cfg->value());
 
         shared_ptr<SrpConfig> smplrate_cfg = device_->config()["samplerate"];
-        uint64_t smplrate = std::get<uint64_t>(smplrate_cfg->value());
+        const uint64_t smplrate = std::get<uint64_t>(smplrate_cfg->value());
 
         cur_storid_ = mcuuid();
         storage_.emplace(cur_storid_, new SrpSamples{cur_storid_, smplrate, smpls_lim, analog });
@@ -220,5 +239,14 @@ namespace srp {
     shared_ptr<SrpSamples> SrpSession::current_storage()
     {
         return storage_[cur_storid_];
+    }
+
+
+    void SrpSession::set_loop(py::object &coro, py::object &coro_stop, py::object &loop)
+    {
+        coro_ = coro;
+        coro_stop_ = coro_stop;
+        loop_ = loop;
+        std::cout << "LOOP SET" << std::endl;
     }
 }

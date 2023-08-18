@@ -6,20 +6,15 @@ include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-#set(CMAKE_CXX_FLAGS "-O3")
-set(CMAKE_CXX_FLAGS "-Og")
-
-#set(CMAKE_CXX_FLAGS "-flto=auto")
-
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_BUILD_TYPE Debug)
-#set(CMAKE_EXPORT_COMPILE_COMMANDS ON) #gen compile_commands.json
-
-if(POLICY CMP0054)
-	cmake_policy(SET CMP0054 NEW)
+set(CMAKE_CXX_FLAGS "-O3")
+#set(CMAKE_CXX_EXTENSIONS OFF)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING
+    "Choose the type of build (None, Debug, Release, RelWithDebInfo, MinSizeRel)."
+    FORCE)
 endif()
 
-cmake_policy(SET CMP0057 NEW)
+#set(CMAKE_EXPORT_COMPILE_COMMANDS ON) #gen compile_commands.json
 
 include(CheckIPOSupported)
 check_ipo_supported(RESULT supported OUTPUT error)
@@ -30,41 +25,34 @@ else()
     message(STATUS "IPO / LTO not supported: <${error}>")
 endif()
 
+find_package(gflags REQUIRED)
+find_package(Folly CONFIG REQUIRED)
+list(APPEND LINK_LIBS Folly::folly)
+
+find_package(Threads REQUIRED)
+list(APPEND LINK_LIBS Threads::Threads)
+
+find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+find_package(pybind11 CONFIG REQUIRED)
+list(APPEND LINK_LIBS pybind11::headers)
+
+find_package(PkgConfig REQUIRED)
+#list(APPEND PKGDEPS glib-2.0)
+#list(APPEND PKGDEPS glibmm-2.4)
+list(APPEND PKGDEPS uuid)
+list(APPEND PKGDEPS libsigrokcxx)
+list(APPEND PKGDEPS libsigrokdecode)
+pkg_check_modules(PKGDEPS REQUIRED ${PKGDEPS})
+
+list(APPEND LINK_LIBS ${PKGDEPS_LIBRARIES})
+
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_THREAD_LIBS_INIT}
+    ${PKGDEPS_INCLUDE_DIRS}
 )
 
-find_package(PkgConfig REQUIRED)
-find_package(Threads REQUIRED)
-
-find_package(pybind11 CONFIG REQUIRED)
-
-pkg_search_module(UUID REQUIRED uuid)
-
-#-------------------------------#
-    #list(APPEND PKGDEPS glibmm)
-#-------------------------------#
-
-list(APPEND PKGDEPS libsigrokcxx)
-
-pkg_check_modules(PKGDEPS REQUIRED ${PKGDEPS})
-
-set(CMAKE_REQUIRED_INCLUDES "${PKGDEPS_INCLUDE_DIRS}")
-set(CMAKE_REQUIRED_LIBRARIES "libsigrokcxx")
-
-include_directories(${PKGDEPS_INCLUDE_DIRS})
-
-foreach (LPATH ${PKGDEPS_LIBRARY_DIRS})
-    list(APPEND CMAKE_REQUIRED_LINK_OPTIONS "-L${LPATH}")
-endforeach ()
-
 link_directories(${PKGDEPS_LIBRARY_DIRS})
-list(APPEND LINK_LIBS ${PKGDEPS_LIBRARIES})
-
-#message("PYTHON_SITE-------->:${PYTHON_SITE}")
-
 
 set(SRC_FILES
     srcxx/srpsamples.cpp
@@ -89,15 +77,15 @@ set(HDR_FILES
     srcxx/srpcxx.hpp
 )
 
-pybind11_add_module(${PROJECT_NAME} MODULE
-    ${SRC_FILES}
-    ${HDR_FILES}
-)
+# pybind11_add_module(${PROJECT_NAME} MODULE
+#     ${SRC_FILES}
+#     ${HDR_FILES}
+# )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${LINK_LIBS} Threads::Threads uuid)
-
+Python_add_library(${PROJECT_NAME} MODULE ${SRC_FILES} WITH_SOABI)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${LINK_LIBS})
 
 install(TARGETS srpy
    COMPONENT python
-   LIBRARY DESTINATION ${PYTHON_SITE}
+   LIBRARY DESTINATION ${Python_SITEARCH}
 )

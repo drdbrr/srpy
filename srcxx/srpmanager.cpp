@@ -4,8 +4,6 @@
 #include "utils.hpp"
 #include <iostream>
 
-//#include "llist.hpp"
-
 using std::string;
 using std::shared_ptr;
 using std::unique_ptr;
@@ -16,6 +14,7 @@ namespace srp {
         ctx_(nullptr)
     {
         std::cout << "SrpManager constructed" << std::endl;
+
         srcheck(sr_init(&ctx_));
         if ( sr_dev_driver **driver_list = sr_driver_list(ctx_)){
             for (int i = 0; driver_list[i]; i++) {
@@ -23,17 +22,6 @@ namespace srp {
                 drivers_.emplace(driver->name(), move(driver));
             }
         }
-
-
-        /*
-        std::byte *addr = new std::byte[20480];
-        LinkedList *llist = new LinkedList{5, 4096, addr};
-
-        for (const auto &item : (*llist)){
-            std::cout << "item: " << (*item).status_ << std::endl;
-        }
-        */
-
     }
 
     SrpManager::~SrpManager()
@@ -48,7 +36,6 @@ namespace srp {
         sessions_.emplace(ses_id, session);
         return session;
     }
-
 
     shared_ptr<SrpSession> SrpManager::add_session()
     {
