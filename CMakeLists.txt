@@ -88,4 +88,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${LINK_LIBS})
 install(TARGETS srpy
    COMPONENT python
    LIBRARY DESTINATION ${Python_SITELIB}
+   #LIBRARY DESTINATION ${PYTHON_SITE}
 )
