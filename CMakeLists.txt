@@ -10,7 +10,7 @@ include(CheckCXXCompilerFlag)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS " -O0 -ggdb3 -march=native")# -save-temps ")# -ffast-math -fomit-frame-pointer -fstrict-aliasing -ftree-vectorize -msse2 -fPIC ")
+set(CMAKE_CXX_FLAGS " -O3 -ggdb3 -march=native")# -save-temps ")# -ffast-math -fomit-frame-pointer -fstrict-aliasing -ftree-vectorize -msse2 -fPIC ")
 #set(CMAKE_CXX_FLAGS "-O3")
 #set(CMAKE_CXX_EXTENSIONS OFF)
 if(NOT CMAKE_BUILD_TYPE)
@@ -102,6 +102,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${LINK_LIBS})
 
 install(TARGETS srpy
    COMPONENT python
-   LIBRARY DESTINATION ${Python_SITELIB}
-   #LIBRARY DESTINATION ${PYTHON_SITE}
+   #LIBRARY DESTINATION ${Python_SITELIB}
+   LIBRARY DESTINATION ${PYTHON_SITE}
 )
