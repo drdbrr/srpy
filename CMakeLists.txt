@@ -2,11 +2,16 @@ cmake_minimum_required(VERSION 3.24)
 
 project(srpy VERSION 1.0 DESCRIPTION "Python bindings for sigrok C++ extension" LANGUAGES CXX)
 
+#set(CMAKE_C_COMPILER clang)
+#set(CMAKE_CXX_COMPILER clang++)
+
 include(GNUInstallDirs)
+include(CheckCXXCompilerFlag)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-O3")
+set(CMAKE_CXX_FLAGS " -O0 -ggdb3 -march=native")# -save-temps ")# -ffast-math -fomit-frame-pointer -fstrict-aliasing -ftree-vectorize -msse2 -fPIC ")
+#set(CMAKE_CXX_FLAGS "-O3")
 #set(CMAKE_CXX_EXTENSIONS OFF)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING
@@ -25,9 +30,15 @@ else()
     message(STATUS "IPO / LTO not supported: <${error}>")
 endif()
 
-find_package(gflags REQUIRED)
-find_package(Folly CONFIG REQUIRED)
-list(APPEND LINK_LIBS Folly::folly)
+#add_subdirectory(c-blosc2)
+
+
+#find_package(Blosc2 REQUIRED)
+#list(APPEND LINK_LIBS blosc2)
+
+find_package(OpenMP REQUIRED)
+list(APPEND LINK_LIBS OpenMP::OpenMP_CXX)
+
 
 find_package(Threads REQUIRED)
 list(APPEND LINK_LIBS Threads::Threads)
@@ -36,9 +47,11 @@ find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
 list(APPEND LINK_LIBS pybind11::headers)
 
+
 find_package(PkgConfig REQUIRED)
 #list(APPEND PKGDEPS glib-2.0)
 #list(APPEND PKGDEPS glibmm-2.4)
+list(APPEND PKGDEPS libzstd)
 list(APPEND PKGDEPS uuid)
 list(APPEND PKGDEPS libsigrokcxx)
 list(APPEND PKGDEPS libsigrokdecode)
@@ -55,7 +68,8 @@ include_directories(
 link_directories(${PKGDEPS_LIBRARY_DIRS})
 
 set(SRC_FILES
-    srcxx/srpsamples.cpp
+    #srcxx/srpsamples.cpp
+    srcxx/srpsamples_segmented.cpp
     srcxx/srpconfig.cpp
     srcxx/srpchannels.cpp
     srcxx/srpdevice.cpp
@@ -66,7 +80,8 @@ set(SRC_FILES
 )
 
 set(HDR_FILES
-    srcxx/srpsamples.hpp
+    #srcxx/srpsamples.hpp
+    srcxx/srpsamples_segmented.hpp
     srcxx/srpconfig.hpp
     srcxx/srpchannels.hpp
     srcxx/srpdevice.hpp

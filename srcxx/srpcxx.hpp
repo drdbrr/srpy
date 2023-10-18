@@ -14,6 +14,14 @@ namespace srp {
 
     //struct AChStat;
 
-    class SrpSamples;
-    class SrpZstd;
+
+    //class SrpSamples;
+    class SrpSamplesSegmented;
+    using SrpSamples = SrpSamplesSegmented;
 }
+
+/*
+namespace compr {
+    class ZSTD_Compressor;
+}
+*/

@@ -17,6 +17,8 @@ namespace srp {
         void remove_session(std::string name);
         void remove_all();
         std::map <std::string, std::shared_ptr<SrpDriver> > drivers();
+
+        void loglevel_set(int lvl);
         
     private:
         std::map<std::string, std::shared_ptr<SrpSession> > sessions_;

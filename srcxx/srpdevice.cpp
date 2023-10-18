@@ -3,13 +3,24 @@
 #include "srpdriver.hpp"
 #include "srpchannels.hpp"
 #include "srpconfig.hpp"
+#include "srpsamples_segmented.hpp"
 
+#include <unistd.h>
 #include <iostream>
+#include <typeinfo>
 
 using std::unique_ptr;
 using std::shared_ptr;
 using std::string;
 using std::map;
+
+static const uint32_t GET_BUF_SIZE_ALLIGNED(const uint64_t samplerate) {
+    const uint16_t T_LIMIT = 200;
+    const uint64_t limit = samplerate / (1000 / T_LIMIT) * sizeof(float);// + sizeof(srp::BufSegment);
+    const uint32_t pgsz = sysconf(_SC_PAGESIZE);
+    const uint32_t size = (((limit + pgsz) & ~(pgsz - 1)));
+    return size;
+}
 
 namespace srp {
     SrpDevice::SrpDevice(shared_ptr<SrpDriver> driver, struct sr_dev_inst *sdi):
@@ -141,5 +152,25 @@ namespace srp {
     shared_ptr<SrpDevice> SrpDevice::get_shared_from_this()
     {
         return static_pointer_cast<SrpDevice>(shared_from_this());
+    }
+
+    const uint64_t SrpDevice::get_buf_size()
+    {
+        uint32_t bufsize;
+
+        if ( confs_.contains("buffersize") ) { //( sr_dev_has_option(sdi_, SR_CONF_BUFFERSIZE) ){
+            auto& bufsize_cfg = confs_["buffersize"];
+            //shared_ptr<SrpConfig> bufsize_cfg = config()["buffersize"];
+            auto sz = bufsize_cfg->value();
+
+            bufsize = std::get<uint64_t>(bufsize_cfg->value());
+            //std::cout << "-----> TYPE: " << (int)bufssize << std::endl;
+        }
+        else {
+            auto& smplrate_cfg = confs_["samplerate"];
+            const uint64_t smplrate = std::get<uint64_t>(smplrate_cfg->value());
+            bufsize  = GET_BUF_SIZE_ALLIGNED(smplrate);
+        }
+        return bufsize;
     }
 }

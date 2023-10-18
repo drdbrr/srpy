@@ -37,6 +37,12 @@ namespace srp {
         std::shared_ptr<SrpSamples> get_storage(std::string stor_id);
         std::shared_ptr<SrpSamples> current_storage();
 
+        std::map<std::string, std::shared_ptr<SrpSamples>> samples_stor();
+
+
+        std::vector<std::shared_ptr<SrpDevice>> getScan();
+        void setScan(std::vector<std::shared_ptr<SrpDevice>> devs);
+
 
         void set_loop(py::object &coro, py::object &coro_stop, py::object &loop);
         const py::function run_coro_ts;
@@ -65,6 +71,8 @@ namespace srp {
 
         bool out_of_memory_;
 
+
+        std::vector<std::shared_ptr<SrpDevice> > scanned_;
 
         std::vector<std::shared_ptr<SrpDecoder> > stack_;
 

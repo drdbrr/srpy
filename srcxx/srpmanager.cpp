@@ -15,6 +15,7 @@ namespace srp {
     {
         std::cout << "SrpManager constructed" << std::endl;
 
+
         srcheck(sr_init(&ctx_));
         if ( sr_dev_driver **driver_list = sr_driver_list(ctx_)){
             for (int i = 0; driver_list[i]; i++) {
@@ -28,6 +29,10 @@ namespace srp {
     {
         srcheck(sr_exit(ctx_));
         std::cout << "SrpManager destructed" << std::endl;
+    }
+
+    void SrpManager::loglevel_set(int lvl){
+        sr_log_loglevel_set(lvl);
     }
 
     shared_ptr<SrpSession> SrpManager::add_session(string ses_id)

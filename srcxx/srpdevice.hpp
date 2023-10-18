@@ -14,6 +14,8 @@ namespace srp {
         std::map<std::string, std::shared_ptr<SrpChannel> > channels();
         std::shared_ptr<SrpChannel> get_channel(std::string const &name);
         std::map<std::string, std::shared_ptr<SrpChGroup> > ch_groups();
+
+        const uint64_t get_buf_size();
         
     private:
         void close();

@@ -1,6 +1,6 @@
 #include "srpsession.hpp"
-#include "srpsamples.hpp"
-//#include "srpsamplesheap.hpp"
+#include "srpsamples_segmented.hpp"
+//#include "srpsamples.hpp"
 #include "srpdevice.hpp"
 #include "srpchannels.hpp"
 #include "srpconfig.hpp"
@@ -21,6 +21,14 @@ using std::vector;
 using std::thread;
 using std::bad_alloc;
 
+static constexpr size_t GET_LIM_SZ(const uint64_t samplerate, const uint64_t limit_samples) {
+    const uint16_t T_LIMIT = 200;
+    const std::size_t limSz = samplerate / (1000 / T_LIMIT);
+    const std::size_t res = std::min( limit_samples, limSz ) * sizeof(float);
+    //std::cout  << "LIMIT SIZE: " << (int)res << std::endl;;
+    return res;
+}
+
 namespace srp {
     SrpSession::SrpSession(struct sr_context *ctx, string ses_id):
         ses_id_(ses_id),
@@ -39,6 +47,19 @@ namespace srp {
         srcheck(sr_session_destroy(session_));
         std::cout << "Session destroyed" << std::endl;
     }
+
+
+
+    std::vector<std::shared_ptr<SrpDevice>> SrpSession::getScan()
+    {
+        return scanned_;
+    }
+
+    void SrpSession::setScan(std::vector<std::shared_ptr<SrpDevice>> devs)
+    {
+        scanned_.swap(devs);
+    }
+
 
     static void data_feed_in(const struct sr_dev_inst *sdi, const struct sr_datafeed_packet *packet, void *cb_data)
     {
@@ -106,6 +127,7 @@ namespace srp {
         }
 
         srcheck(sr_session_datafeed_callback_add(session_, &data_feed_in, this));
+        scanned_.clear();
     }
 
     void SrpSession::reset_device()
@@ -116,6 +138,7 @@ namespace srp {
         device_.reset(); //Reset shared_ptr
         srcheck(sr_session_dev_remove_all(session_));
         srcheck(sr_session_datafeed_callback_remove_all(session_));
+        scanned_.clear();
     }
 
     void SrpSession::sampl_proc_th()
@@ -209,16 +232,33 @@ namespace srp {
             }
         }
 
+        /*
         shared_ptr<SrpConfig> smpls_lim_cfg = device_->config()["limit_samples"];
         const uint64_t smpls_lim = std::get<uint64_t>(smpls_lim_cfg->value());
 
         shared_ptr<SrpConfig> smplrate_cfg = device_->config()["samplerate"];
         const uint64_t smplrate = std::get<uint64_t>(smplrate_cfg->value());
+        */
 
         cur_storid_ = mcuuid();
-        storage_.emplace(cur_storid_, new SrpSamples{cur_storid_, smplrate, smpls_lim, analog });
+        //size_t blkLim = GET_LIM_SZ(smplrate, smpls_lim);
+
+        const uint32_t bufsize = device_->get_buf_size();
+        //std::cout << "-----> bufsize: " << (int)bufsize << std::endl;
+
+        storage_.emplace(cur_storid_, new SrpSamples{cur_storid_, bufsize, analog });
+
+
+        //storage_.emplace(cur_storid_, new SrpSamples{cur_storid_, smplrate, smpls_lim, analog });
         //storage_[cur_storid_] = shared_ptr<SrpSamples>{ new SrpSamples{cur_storid_, analog, logic, smplrate, smpls_lim}, std::default_delete<SrpSamples>{} };
     }
+
+
+    std::map<std::string, std::shared_ptr<SrpSamples>> SrpSession::samples_stor()
+    {
+        return storage_;
+    }
+
 
     void SrpSession::remove_storage(string stor_id)
     {

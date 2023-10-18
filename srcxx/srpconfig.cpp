@@ -131,14 +131,15 @@ namespace srp {
                 gvar = g_variant_new_double( data );
             }
             
-    //         else if (info_->datatype == SR_T_RATIONAL_VOLT && PyTuple_Check(input) && PyTuple_Size(input) == 2) {
-    //             PyObject *numObj = PyTuple_GetItem(input, 0);
-    //             PyObject *denomObj = PyTuple_GetItem(input, 1);
-    //             if (PyLong_Check(numObj) && PyLong_Check(denomObj)) {
-    //                 guint64 q = PyLong_AsLong(numObj);
-    //                 guint64 p = PyLong_AsLong(denomObj);
-    //                 gvar = g_variant_new("(tt)", q, p);
-    //             }
+            else if ( (info_->datatype == SR_T_RATIONAL_VOLT) && PyTuple_Check(pyval.ptr()) && PyTuple_Size(pyval.ptr()) == 2) {
+                PyObject *numObj = PyTuple_GetItem(pyval.ptr(), 0);
+                PyObject *denomObj = PyTuple_GetItem(pyval.ptr(), 1);
+                if (PyLong_Check(numObj) && PyLong_Check(denomObj)) {
+                    guint64 q = PyLong_AsLong(numObj);
+                    guint64 p = PyLong_AsLong(denomObj);
+                    gvar = g_variant_new("(tt)", q, p);
+                }
+            }
             
             py::gil_scoped_release release;
             srcheck(sr_config_set(conf_sdi_, conf_cg_, info_->key, gvar));
