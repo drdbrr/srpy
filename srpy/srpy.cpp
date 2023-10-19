@@ -69,6 +69,11 @@ PYBIND11_MODULE(srpy, m) {
           //.def_property_readonly("device", &srp::SrpSession::device)
           .def_property("scanned_devs", &srp::SrpSession::getScan, &srp::SrpSession::setScan)
 
+          .def_property_readonly("id", &srp::SrpSession::id)
+          .def_property_readonly("name", &srp::SrpSession::name)
+          .def_property_readonly("type", &srp::SrpSession::type)
+
+
           .def("reset_device", &srp::SrpSession::reset_device);
 
      py::enum_<srp::SrpSession::Capture>(m, "Capture")

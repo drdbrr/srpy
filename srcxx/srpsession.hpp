@@ -42,6 +42,10 @@ namespace srp {
 
         std::vector<std::shared_ptr<SrpDevice>> getScan();
         void setScan(std::vector<std::shared_ptr<SrpDevice>> devs);
+        const std::string id() const;
+        const std::string name() const;
+        const std::string type() const;
+        //const std::string sourcename();
 
 
         void set_loop(py::object &coro, py::object &coro_stop, py::object &loop);
@@ -51,11 +55,18 @@ namespace srp {
         py::object coro_stop_;
         py::object loop_;
 
+
+
     private:
         const std::string ses_id_;
+        static int nameCnt_;
+        const std::string name_;
+
         struct sr_session *session_;
         struct sr_context *ctx_;
         std::shared_ptr<SrpDevice> device_;
+
+
 
 
         

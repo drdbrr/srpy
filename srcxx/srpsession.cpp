@@ -30,8 +30,11 @@ static constexpr size_t GET_LIM_SZ(const uint64_t samplerate, const uint64_t lim
 }
 
 namespace srp {
+    int SrpSession::nameCnt_ = 0;
+
     SrpSession::SrpSession(struct sr_context *ctx, string ses_id):
-        ses_id_(ses_id),
+        ses_id_(std::move(ses_id)),
+        name_("Session " + std::to_string(nameCnt_++)),
         session_(nullptr),
         ctx_(move(ctx)),
         run_coro_ts{py::module_::import("asyncio").attr("run_coroutine_threadsafe")},
@@ -48,17 +51,37 @@ namespace srp {
         std::cout << "Session destroyed" << std::endl;
     }
 
-
-
-    std::vector<std::shared_ptr<SrpDevice>> SrpSession::getScan()
-    {
+    std::vector<std::shared_ptr<SrpDevice>> SrpSession::getScan(){
         return scanned_;
     }
 
-    void SrpSession::setScan(std::vector<std::shared_ptr<SrpDevice>> devs)
-    {
+    void SrpSession::setScan(std::vector<std::shared_ptr<SrpDevice>> devs){
         scanned_.swap(devs);
     }
+
+    const std::string SrpSession::id() const{
+        return ses_id_;
+    }
+
+
+    const std::string SrpSession::name() const {
+        return name_;
+    }
+
+    const std::string SrpSession::type() const{
+        return (device_ == nullptr) ? "BLANK" : "DEVICE";
+    }
+    /*
+
+    const std::string SrpSession::sourcename(){
+        auto drv = device_->driver();
+        return drv->name();
+    }
+
+    const std::string SrpSession::channels(){
+    std::map<std::string, std::shared_ptr<SrpChannel> > device_->channels();
+    */
+
 
 
     static void data_feed_in(const struct sr_dev_inst *sdi, const struct sr_datafeed_packet *packet, void *cb_data)
