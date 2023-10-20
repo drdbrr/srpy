@@ -26,7 +26,7 @@ PYBIND11_MODULE(srpy, m) {
           .def("enabled", &srp::SrpChannel::enabled)
           .def("set_enabled", &srp::SrpChannel::set_enabled);
      
-     py::class_<srp::SrpManager, std::shared_ptr<srp::SrpManager> >(m, "SrpManager")
+     py::class_<srp::SrpManager, std::shared_ptr<srp::SrpManager> > srpmng(m, "SrpManager")
           .def(py::init<>())
           .def_property_readonly("sessions", &srp::SrpManager::sessions)
           .def("add_session", py::overload_cast<>(&srp::SrpManager::add_session), py::return_value_policy::reference)
