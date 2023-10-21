@@ -62,11 +62,11 @@ PYBIND11_MODULE(srpy, m) {
           .def("start_capture", &srp::SrpSession::start_capture, py::call_guard<py::gil_scoped_release>())
           .def("stop_capture", &srp::SrpSession::stop_capture, py::call_guard<py::gil_scoped_release>())
           .def("add_device", &srp::SrpSession::add_device, py::call_guard<py::gil_scoped_release>())
-          .def("device", &srp::SrpSession::device)
+          //.def("device", &srp::SrpSession::device)
           .def("remove_storage", py::overload_cast<>(&srp::SrpSession::remove_storage))
           .def_property_readonly("samples_stor", &srp::SrpSession::samples_stor)
           //.def("get_storage", &srp::SrpSession::get_storage)
-          //.def_property_readonly("device", &srp::SrpSession::device)
+          .def_property_readonly("device", &srp::SrpSession::device)
           .def_property("scanned_devs", &srp::SrpSession::getScan, &srp::SrpSession::setScan)
 
           .def_property_readonly("id", &srp::SrpSession::id)
