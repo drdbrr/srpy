@@ -3,11 +3,6 @@
 #include "srpconfig.hpp"
 #include "utils.hpp"
 
-using std::string;
-using std::shared_ptr;
-using std::unique_ptr;
-using std::map;
-
 namespace srp {
     SrpChGroup::SrpChGroup(SrpDevice *srp_device, struct sr_channel_group *cg):
         ch_group_(cg)
@@ -18,8 +13,8 @@ namespace srp {
         if (opts) {
             for (guint i = 0; i < opts->len; i++){
                 uint32_t key = g_array_index(opts, uint32_t, i);
-                unique_ptr<SrpConfig> cg_conf {new SrpConfig{key, drv, srp_device->sdi_, cg}};
-                cg_confs_.emplace(cg_conf->id(), move(cg_conf));
+                std::shared_ptr<SrpConfig> cg_conf {new SrpConfig{key, drv, srp_device->sdi_, cg}};
+                cg_confs_.emplace(cg_conf->id(), std::move(cg_conf));
             }
         }
     }
@@ -29,23 +24,22 @@ namespace srp {
     {}
     */
 
-    string SrpChGroup::name()
-    {
+    std::string SrpChGroup::name() {
         return ch_group_->name;
-    }
+    };
 
-    map<string, shared_ptr<SrpConfig> > SrpChGroup::config()
-    {
+    std::map<std::string, std::shared_ptr<SrpConfig> > SrpChGroup::config() {
+        /*
         map<string, shared_ptr<SrpConfig>> result;
         
         for (auto const& [name, cgconf]: cg_confs_){
             result.emplace(name, cgconf->share_owned_by(parent()));
         }
-        
-        return result;
-    }
+        */
+        return cg_confs_;//result;
+    };
 
-    uint16_t SrpChGroup::size(){
+    uint16_t SrpChGroup::size() {
         return g_slist_length(ch_group_->channels);
     }
 
@@ -53,33 +47,28 @@ namespace srp {
     //--------- SrpChannel ---------//
     SrpChannel::SrpChannel(struct sr_channel *ch):
         ch_(ch)
-    {}
+    {};
 
     SrpChannel::~SrpChannel()
-    {}
+    {};
 
-    string SrpChannel::name() const
-    {
+    std::string SrpChannel::name() const {
         return ch_->name;
-    }
+    };
 
-    int SrpChannel::type() const
-    {
+    int SrpChannel::type() const {
         return ch_->type;
-    }
+    };
 
-    const bool SrpChannel::enabled() const
-    {
+    const bool SrpChannel::enabled() const {
         return ch_->enabled;
-    }
+    };
 
-    void SrpChannel::set_enabled(const bool value)
-    {
+    void SrpChannel::set_enabled(const bool value) {
         srcheck(sr_dev_channel_enable(ch_, value));
-    }
+    };
 
-    unsigned int SrpChannel::index() const
-    {
+    unsigned int SrpChannel::index() const {
         return ch_->index;
-    }
+    };
 }

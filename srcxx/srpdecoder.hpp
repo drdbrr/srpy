@@ -1,3 +1,6 @@
+#ifndef SRP_DECODER_HPP
+#define SRP_DECODER_HPP
+
 #include <libsigrokdecode/libsigrokdecode.h>
 #include <glib.h>
 #include "srpcxx.hpp"
@@ -45,3 +48,4 @@ namespace srp {
         srd_decoder_inst *decoder_inst_;
     };
 };
+#endif

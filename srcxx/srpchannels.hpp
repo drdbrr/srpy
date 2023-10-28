@@ -1,10 +1,17 @@
+#ifndef SRP_CHANNELS_HPP
+#define SRP_CHANNELS_HPP
+
 #include <libsigrokcxx/libsigrokcxx.hpp>
-#include <libsigrok/libsigrok.h>
-#include "srpcxx.hpp"
+
+#include <map>
+#include <string>
+#include <memory>
 
 namespace srp {
-    class SrpChGroup: public sigrok::ParentOwned<SrpChGroup, SrpDevice>
-    {
+    class SrpDevice;
+    class SrpConfig;
+
+    class SrpChGroup: public sigrok::ParentOwned<SrpChGroup, SrpDevice> {
     public:
         SrpChGroup(SrpDevice *srp_device, struct sr_channel_group *cg);
         ~SrpChGroup() {};
@@ -15,14 +22,13 @@ namespace srp {
 
     private:
         struct sr_channel_group *ch_group_;
-        std::map<std::string, std::unique_ptr<SrpConfig> > cg_confs_;
+        std::map<std::string, std::shared_ptr<SrpConfig> > cg_confs_;
         
         friend class SrpDevice;
         friend struct std::default_delete<SrpChGroup>;
     };
 
-    class SrpChannel: public sigrok::ParentOwned<SrpChannel, SrpDevice>
-    {
+    class SrpChannel: public sigrok::ParentOwned<SrpChannel, SrpDevice> {
     public:
         std::string name() const;
         int type() const;
@@ -37,4 +43,5 @@ namespace srp {
         friend class SrpDevice;
         friend struct std::default_delete<SrpChannel>;
     };
-}
+};
+#endif

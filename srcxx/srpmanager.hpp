@@ -1,11 +1,16 @@
-#include <libsigrok/libsigrok.h>
-#include "srpcxx.hpp"
+#ifndef SRP_MANAGER_HPP
+#define SRP_MANAGER_HPP
+
+#include "srpsession.hpp"
+#include <string>
 #include <memory>
 #include <map>
 
+
 namespace srp {
-    class SrpManager : public std::enable_shared_from_this<SrpManager>
-    {
+    class SrpDriver;
+
+    class SrpManager : public std::enable_shared_from_this<SrpManager> {
     public:
         SrpManager();
         ~SrpManager();
@@ -27,7 +32,7 @@ namespace srp {
 
 
         friend class SrpDriver;
-        friend class SrpSession;
         friend struct std::default_delete<SrpManager>;
     };
-};
+}
+#endif
