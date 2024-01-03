@@ -29,7 +29,7 @@ PYBIND11_MODULE(srpy, m) {
           .def_property_readonly("drivers", &srp::SrpManager::drivers);
 
      py::class_<srp::SrpSession, std::shared_ptr<srp::SrpSession> >(m, "SrpSession")
-          .def("capture_state", &srp::SrpSession::get_capture_state)
+          .def_property_readonly("capture_state", &srp::SrpSession::get_capture_state)
           .def("start_capture", &srp::SrpSession::start_capture, py::call_guard<py::gil_scoped_release>())
           .def("stop_capture", &srp::SrpSession::stop_capture, py::call_guard<py::gil_scoped_release>())
           .def("add_device", &srp::SrpSession::add_device, py::call_guard<py::gil_scoped_release>())
